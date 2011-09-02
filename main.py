@@ -62,6 +62,8 @@ e,ssh-cmd= the command to use to connect to the remote [ssh]
 seed-hosts= with -H, use these hostnames for initial scan (comma-separated)
 no-latency-control  sacrifice latency to improve bandwidth benchmarks
 wrap=      restart counting channel numbers after this number (for testing)
+config-file= the config file containing connections [~/.sshuttle]
+c,config=    read the actual connection parameters from the config file
 D,daemon   run in the background as a daemon
 V,version  print sshuttle's version number
 syslog     send log messages to syslog (default if you use --daemon)
@@ -77,6 +79,25 @@ if opt.version:
     import version
     print version.TAG
     sys.exit(0)
+
+if opt.config:
+    config_file = os.path.expanduser(opt.config_file)
+    if not os.access(config_file, os.R_OK):
+        o.fatal('config-file (%s) not readable' % opt.config_file)
+        sys.exit(99)
+    config = opt.config
+    # reset the options
+    (opt, flags, extra) = (None, None, None)
+    with open(config_file, 'r') as f:
+        for line in f.readlines():
+            if line.startswith('%s:' % config):
+                opt_line = line[len(config) + 1:].strip().split(' ')
+                (opt, flags, extra) = o.parse(opt_line)
+                break
+    if opt is None:
+        o.fatal('config not found')
+        sys.exit(99)
+
 if opt.daemon:
     opt.syslog = 1
 if opt.wrap:

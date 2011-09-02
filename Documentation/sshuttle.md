@@ -159,6 +159,13 @@ entire subnet to the VPN.
     makes it a lot easier to debug and test the `--auto-hosts`
     feature.
 
+--config-file
+:   the file containing connection configurations. By default,
+    we look in `~/.sshuttle`.
+
+-c,--config
+:   the connection parameter set you want to use.
+
 
 # EXAMPLES
 
@@ -207,6 +214,18 @@ and subnet guessing:
     firewall manager: undoing changes.
     c : Keyboard interrupt: exiting.
     c : SW#6:192.168.42.121:60554: deleting
+
+Configuration file:
+
+The format of the configuration file is rather simple.
+E.g. this could be the config file for the previous example:
+
+    example: -vNHr example.org
+
+And that would make the following statements equivalent.
+
+    $ sshuttle -vNHr example.org
+    $ sshuttle -c example
 
 
 # DISCUSSION
